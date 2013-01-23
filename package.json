@@ -1,0 +1,21 @@
+{
+  "name": "n3-2-d3",
+  "description":"Simple conversion of N3 triples to json data file (parent/children), whis can be used for visualization using d3js.org",
+  "tags": [ "N3", "d3js.org" ],
+  "version": "0.0.1",
+  "author":"Jaroslav Kuchar <jaroslav.kuchar@gmail.com>",
+  "private": true, 
+  "repository" : { 
+  	"type" : "git", 
+  	"url" : "http://github.com/jaroslav-kuchar/n3-2-d3.git"
+  },
+  "dependencies": {
+  	"optimist":"0.3.5",
+    "request": "2.12.x",
+    "n3": "0.0.5"
+  },
+  "engines": {
+    "node": "0.8.x",
+    "npm": "1.1.x"
+  }
+}
