@@ -4,7 +4,6 @@ var argv = require('optimist')
     .demand(['n3','prefix'])
     .describe('n3', 'URL of N3 source file')
     .describe('prefix', 'prefix to limit')
-    //.default('prefix', 'http://nerd.eurecom.fr/ontology')
     .argv;
 
 // modules
@@ -27,10 +26,10 @@ request(n3source, function(error, response, body) {
         // n3 parser
         parser.parse(body, function(error, triple) {
             if (triple) {
-                if(triple.subject.indexOf(prefix)!=-1 && triple.object.indexOf(prefix)!=-1){
+                if(triple.subject.indexOf(prefix)!=-1 && (triple.object.indexOf(prefix)!=-1 || triple.predicate == 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type')) {
 
                     // get name from subject of triple of concept from uri (http://example.com#Name)
-                    var name = (triple.subject.split('#'))[1];
+                    var name = (((triple.subject.split('#'))[1])?((triple.subject.split('#'))[1]):triple.subject.substr(triple.subject.lastIndexOf('/')+1));
                     // if not exists in set
                     if (!set[name]) {
                         // create new object and set default values
@@ -42,13 +41,28 @@ request(n3source, function(error, response, body) {
                     }
                     if (triple.predicate == 'http://www.w3.org/2000/01/rdf-schema#subClassOf') {
                         // get parent name from object of triple
-                        var par = (triple.object.split('#'))[1];
+                        var par = (((triple.object.split('#'))[1])?((triple.object.split('#'))[1]):triple.object.substr(triple.object.lastIndexOf('/')+1));
                         // set parent if exists
                         set[name].parent = par;
                     }
+                    if (triple.predicate == 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type') {
+                        // get type
+                        var par2 = (((triple.object.split('#'))[1])?((triple.object.split('#'))[1]):triple.object.substr(triple.object.lastIndexOf('/')+1));
+                        // set parent if exists
+                        set[name].type = par2;
+                    }
                 }
             } else {
-                // all triples processed                
+                // all triples processed
+                for(var i in set){
+                    if((set[i].type && set[i].type!='Class') || i=='Thing' || i=='schema-tmp'){
+                        delete set[i];
+                        set.size--;
+                    } else {
+                        delete set[i].type;
+                    }
+                }
+                //console.log(set);
                 buildTree(set);
                 console.log(JSON.stringify(tree));
             }
