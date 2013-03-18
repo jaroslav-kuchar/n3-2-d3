@@ -34,6 +34,7 @@ request(n3source, function(error, response, body) {
                     if (!set[name]) {
                         // create new object and set default values
                         set[name] = {};
+                        set[name].uri = triple.subject;
                         set[name].name = name;
                         // default parent
                         set[name].parent = 'Thing';
@@ -77,6 +78,7 @@ request(n3source, function(error, response, body) {
 function buildTree(set) {
     // root
     tree.name = 'Thing';
+    tree.uri = prefix+'#Thing';
     tree.children = [];
     // while anything in set except size property
     while (set.size > 0) {
